@@ -13,6 +13,12 @@ var sourcemaps = require('gulp-sourcemaps');
 var browserSync = require('browser-sync');
 var childProcess = require('child_process');
 var pkg = require('./package.json');
+
+
+let test1 = require('./css-var-to-hex.js')
+let test2 = require('./css-var-to-hex-stream.js')
+let csstree = require('gulp-csstree')
+
 var yargs = require('yargs').options({
   w: {
     alias: 'watch',
@@ -185,3 +191,24 @@ gulp.task('default', ['build'], function() {
     gulp.start('watch');
   }
 });
+
+
+gulp.task('test1', function(){
+  gulp.src('./test.txt')
+    .pipe(test1('我是傻猪'))
+    .pipe(gulp.dest(dist))
+})
+
+gulp.task('test2', function(){
+  gulp.src('./test.txt')
+    .pipe(test2('哈哈哈哈2'))
+    .pipe(gulp.dest(dist))
+})
+
+gulp.task('csscss', function(){
+  gulp.src('./test.css')
+    .pipe(csstree())
+    .pipe(test1('css'))
+    .pipe(gulp.dest(dist))
+})
+

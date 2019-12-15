@@ -1,0 +1,8 @@
+.example{
+    color: var(--bg);
+    background: #000;
+}
+
+.example .aa {
+    margin: 10px;
+}
