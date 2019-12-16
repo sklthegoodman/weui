@@ -13,6 +13,8 @@ var sourcemaps = require('gulp-sourcemaps');
 var browserSync = require('browser-sync');
 var childProcess = require('child_process');
 var pkg = require('./package.json');
+let convertCssVar = require('gulp-convert-css-var')
+
 var yargs = require('yargs').options({
   w: {
     alias: 'watch',
@@ -46,7 +48,7 @@ function exec (cmd) {
   });
 }
 
-gulp.task('build:style', function() {
+gulp.task('build:style', ['build:theme'], function() {
   var banner = [
     '/*!',
     ' * WeUI v<%= pkg.version %> (<%= pkg.homepage %>)',
@@ -65,6 +67,7 @@ gulp.task('build:style', function() {
       })
     )
     .pipe(postcss([autoprefixer(['iOS >= 7', 'Android >= 4.1']), comments()]))
+    .pipe(convertCssVar())
     .pipe(header(banner, { pkg: pkg }))
     .pipe(sourcemaps.write())
     .pipe(gulp.dest(dist))
@@ -82,6 +85,33 @@ gulp.task('build:style', function() {
       })
     )
     .pipe(gulp.dest(dist));
+});
+
+gulp.task('build:theme', function(){
+  let themeDist = dist + '/style/theme'
+  gulp
+    .src('src/style/base/theme/*.less')
+    .pipe(
+      less().on('error', function(e) {
+        console.error(e.message);
+        this.emit('end');
+      })
+    )
+    .pipe(gulp.dest(themeDist))
+    .pipe(browserSync.reload({ stream: true }))
+    .pipe(
+      nano({
+        zindex: false,
+        autoprefixer: false,
+        svgo: false
+      })
+    )
+    .pipe(
+      rename(function(path) {
+        path.basename += '.min';
+      })
+    )
+    .pipe(gulp.dest(themeDist));
 });
 
 gulp.task('build:example:assets', function() {
